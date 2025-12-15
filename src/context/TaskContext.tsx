@@ -21,7 +21,7 @@ export const TaskProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     { id: uuidv4(), title: 'Suunnittele komponentit', description: 'Aloita TaskItemin ja FlatListin luomisella.', completed: true, createdAt: Date.now() - 3600000 },
     { id: uuidv4(), title: 'Tee ThemeContext', description: 'Toteuta tumman ja vaalean teeman vaihtomekanismi.', completed: true, createdAt: Date.now() - 1800000 },
     { id: uuidv4(), title: 'Koodaa TaskListScreen', description: 'Tämä on pääsivu, jolla tehtävät näkyvät.', completed: false, createdAt: Date.now() },
-    { id: uuidv4(), title: 'Lisää navigointi', description: 'React Navigationin käyttöönotto kirjautumiseen ja listanäkymään.', completed: false, createdAt: Date.now() + 600000 },
+    { id: uuidv4(), title: 'Lisää navigointi', description: 'React Navigationin käyttöönotto kirjautumiseen ja listanäkymään.', completed: false, createdAt: Date.now() - 600000 },
   ]);
 
   // Lisää uusi tehtävä
