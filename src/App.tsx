@@ -1,32 +1,38 @@
-import React from 'react';
-import { ThemeProvider } from './context/ThemeContext';
-import { TaskProvider } from './context/TaskContext'; // <-- Tuo TaskProvider
-import TaskListScreen from './screens/TaskListScreen'; // <-- Tuo uusi näyttö
-import { StatusBar } from 'react-native';
-import { useTheme } from './context/ThemeContext';
+import React, { useState } from "react";
+import { StatusBar } from "react-native";
 
-// Pääkomponentti, joka asettaa status barin teeman mukaan
+import { ThemeProvider, useTheme } from "./context/ThemeContext";
+import { TaskProvider } from "./context/TaskContext";
+
+import TaskListScreen from "./screens/TaskListScreen";
+import LoginScreen from "./screens/LoginScreen";
+
+// Pääkomponentti, jossa päätetään mitä näytetään
 const RootComponent = () => {
   const { currentThemeName } = useTheme();
-  // Status barin väri riippuen teemasta
-  const barStyle = currentThemeName === 'light' ? 'dark-content' : 'light-content';
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const barStyle =
+    currentThemeName === "light" ? "dark-content" : "light-content";
 
   return (
     <>
       <StatusBar barStyle={barStyle} />
-      {/* Tähän tulee myöhemmin navigointi, joka päättää, näytetäänkö AuthScreen vai TaskListScreen */}
-      <TaskListScreen />
+      {isLoggedIn ? (
+        <TaskListScreen onLogout={() => setIsLoggedIn(false)} />
+      ) : (
+        <LoginScreen onLogin={() => setIsLoggedIn(true)} />
+      )}
     </>
   );
-}
+};
 
 const App = () => {
   return (
-    // Järjestys on tärkeä: ThemeProvider ensin, koska TaskListScreen käyttää teemaa
     <ThemeProvider>
-        <TaskProvider>
-            <RootComponent />
-        </TaskProvider>
+      <TaskProvider>
+        <RootComponent />
+      </TaskProvider>
     </ThemeProvider>
   );
 };

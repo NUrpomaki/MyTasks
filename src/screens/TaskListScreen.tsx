@@ -1,19 +1,28 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  SafeAreaView,
+  TouchableOpacity,
+} from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { useTasks } from '../context/TaskContext';
-import TaskItem from '../components/Task/TaskItem'; // Tuo TaskItem
+import TaskItem from '../components/Task/TaskItem';
 import { Ionicons } from '@expo/vector-icons';
 import FABButton from '../components/UI/FABButton';
 import AddTaskModal from '../components/Task/AddTaskModal';
 
-const TaskListScreen: React.FC = () => {
-  const { theme, toggleTheme } = useTheme();
+type Props = {
+  onLogout: () => void;
+};
 
-  // Otetaan addTask mukaan, jotta modali voi lisätä tehtävän listaan
+const TaskListScreen: React.FC<Props> = ({ onLogout }) => {
+  const { theme, toggleTheme } = useTheme();
   const { tasks, deleteTask, toggleTask, addTask } = useTasks();
 
-  // Modal auki/kiinni 
+  // Modal auki / kiinni
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
 
   const dynamicStyles = StyleSheet.create({
@@ -30,10 +39,20 @@ const TaskListScreen: React.FC = () => {
       borderBottomWidth: 1,
       borderBottomColor: theme.colors.border,
     },
+    headerLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
     headerTitle: {
-      fontSize: 24,
+      fontSize: 22,
       fontWeight: 'bold',
       color: theme.colors.text,
+      marginLeft: 10,
+    },
+    headerRight: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 16,
     },
     list: {
       flex: 1,
@@ -43,35 +62,61 @@ const TaskListScreen: React.FC = () => {
       textAlign: 'center',
       marginTop: 50,
       fontSize: 16,
-    }
+    },
   });
+
+  const activeTasksCount = tasks.filter(t => !t.completed).length;
+
+  const handleAddTask = (title: string, description?: string) => {
+    addTask(title, description);
+    setIsAddModalVisible(false);
+  };
 
   return (
     <SafeAreaView style={dynamicStyles.safeArea}>
-
-      {/* Yläpalkki (Header) */}
+      {/* Header */}
       <View style={dynamicStyles.header}>
-        <Text style={dynamicStyles.headerTitle}>
-          Omat Tehtävät ({tasks.filter(t => !t.completed).length})
-        </Text>
-
-        {/* Teemanvaihtopainike */}
-        <TouchableOpacity onPress={toggleTheme}>
+        <View style={dynamicStyles.headerLeft}>
           <Ionicons
-            name={theme.name === 'light' ? 'moon' : 'sunny'}
-            size={28}
+            name="list"
+            size={26}
             color={theme.colors.primary}
           />
-        </TouchableOpacity>
+          <Text style={dynamicStyles.headerTitle}>
+            Omat Tehtävät ({activeTasksCount})
+          </Text>
+        </View>
+
+        <View style={dynamicStyles.headerRight}>
+          {/* Teeman vaihto */}
+          <TouchableOpacity onPress={toggleTheme}>
+            <Ionicons
+              name={theme.name === 'light' ? 'moon' : 'sunny'}
+              size={26}
+              color={theme.colors.primary}
+            />
+          </TouchableOpacity>
+
+          {/* Kirjaudu ulos */}
+          <TouchableOpacity onPress={onLogout}>
+            <Ionicons
+              name="log-out-outline"
+              size={26}
+              color={theme.colors.primary}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Tehtävälista */}
       <FlatList
         style={dynamicStyles.list}
         data={[...tasks].sort((a, b) =>
-          (a.completed === b.completed)
-            ? (b.createdAt - a.createdAt)
-            : a.completed ? 1 : -1
+          a.completed === b.completed
+            ? b.createdAt - a.createdAt
+            : a.completed
+            ? 1
+            : -1
         )}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
@@ -88,27 +133,18 @@ const TaskListScreen: React.FC = () => {
         }
       />
 
-      {/* Modaalinäkymä uuden tehtävän lisäämistä varten */}
+      {/* Floating Action Button */}
+      <FABButton onPress={() => setIsAddModalVisible(true)} />
+
+      {/* Add Task Modal */}
       <AddTaskModal
         visible={isAddModalVisible}
         onClose={() => setIsAddModalVisible(false)}
-        onAdd={(title, description) => {
-          // Lisätään tehtävä TaskContextiin
-          addTask(title, description);
-
-          // Suljetaan modali lisäyksen jälkeen
-          setIsAddModalVisible(false);
-        }}
+        onAddTask={handleAddTask}
       />
-
-      {/* Nappi tehtävän lisäämistä varten */}
-      <FABButton onPress={() => {
-        console.log("FAB pressed");
-        setIsAddModalVisible(true);
-      }} />
-
     </SafeAreaView>
   );
 };
 
 export default TaskListScreen;
+
