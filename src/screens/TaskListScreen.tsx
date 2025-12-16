@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,8 @@ import TaskItem from '../components/Task/TaskItem';
 import { Ionicons } from '@expo/vector-icons';
 import FABButton from '../components/UI/FABButton';
 import AddTaskModal from '../components/Task/AddTaskModal';
+import SearchBar from '../components/UI/SearchBar';
+import FilterTabs, { FilterType } from '../components/UI/FilterTabs';
 import { TaskPriority } from '../types/Task';
 
 type Props = {
@@ -25,6 +27,10 @@ const TaskListScreen: React.FC<Props> = ({ onLogout }) => {
 
   // Modal auki / kiinni
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+
+  // Haku- ja suodatintila
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
 
   const dynamicStyles = StyleSheet.create({
     safeArea: {
@@ -66,11 +72,62 @@ const TaskListScreen: React.FC<Props> = ({ onLogout }) => {
     },
   });
 
+  // Lasketaan tehtävien määrät suodattimia varten
+  const filterCounts = useMemo(() => ({
+    all: tasks.length,
+    active: tasks.filter(t => !t.completed).length,
+    completed: tasks.filter(t => t.completed).length,
+  }), [tasks]);
+
+  // Suodatetaan tehtävät haun ja filterin perusteella
+  const filteredTasks = useMemo(() => {
+    let result = [...tasks];
+
+    // Ensin suodatetaan tilan mukaan
+    if (activeFilter === 'active') {
+      result = result.filter(t => !t.completed);
+    } else if (activeFilter === 'completed') {
+      result = result.filter(t => t.completed);
+    }
+
+    // Sitten haun perusteella
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      result = result.filter(t => 
+        t.title.toLowerCase().includes(query) ||
+        (t.description && t.description.toLowerCase().includes(query))
+      );
+    }
+
+    // Järjestetään: keskeneräiset ensin, sitten luontipäivän mukaan
+    return result.sort((a, b) =>
+      a.completed === b.completed
+        ? b.createdAt - a.createdAt
+        : a.completed
+        ? 1
+        : -1
+    );
+  }, [tasks, activeFilter, searchQuery]);
+
   const activeTasksCount = tasks.filter(t => !t.completed).length;
 
   const handleAddTask = (title: string, description?: string, priority?: TaskPriority) => {
     addTask(title, description, priority);
     setIsAddModalVisible(false);
+  };
+
+  // Tyhjän listan teksti riippuu hakutilasta
+  const getEmptyMessage = () => {
+    if (searchQuery.trim()) {
+      return 'Ei hakutuloksia.';
+    }
+    if (activeFilter === 'active') {
+      return 'Ei aktiivisia tehtäviä.';
+    }
+    if (activeFilter === 'completed') {
+      return 'Ei valmiita tehtäviä.';
+    }
+    return 'Ei tehtäviä. Lisää uusi!';
   };
 
   return (
@@ -109,16 +166,23 @@ const TaskListScreen: React.FC<Props> = ({ onLogout }) => {
         </View>
       </View>
 
+      {/* Hakupalkki */}
+      <SearchBar 
+        value={searchQuery} 
+        onChangeText={setSearchQuery} 
+      />
+
+      {/* Suodatinvälilehdet */}
+      <FilterTabs
+        selected={activeFilter}
+        onSelect={setActiveFilter}
+        counts={filterCounts}
+      />
+
       {/* Tehtävälista */}
       <FlatList
         style={dynamicStyles.list}
-        data={[...tasks].sort((a, b) =>
-          a.completed === b.completed
-            ? b.createdAt - a.createdAt
-            : a.completed
-            ? 1
-            : -1
-        )}
+        data={filteredTasks}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TaskItem
@@ -129,7 +193,7 @@ const TaskListScreen: React.FC<Props> = ({ onLogout }) => {
         )}
         ListEmptyComponent={
           <Text style={dynamicStyles.emptyText}>
-            Ei tehtäviä. Lisää uusi!
+            {getEmptyMessage()}
           </Text>
         }
       />
