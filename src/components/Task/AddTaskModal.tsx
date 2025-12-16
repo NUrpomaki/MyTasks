@@ -1,24 +1,28 @@
 import React, { useState } from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
+import { TaskPriority } from '../../types/Task';
+import PriorityPicker from './PriorityPicker';
 
 // Modal uuden tehtävän lisäämistä varten.
-// Tässä vaiheessa: otsikko + kuvaus + lisää/peruuta, ei vielä kuvaa.
+// Sisältää otsikon, kuvauksen ja prioriteetin valinnan.
 const AddTaskModal: React.FC<{
   visible: boolean;
   onClose: () => void;
-  onAdd: (title: string, description?: string) => void;
-}> = ({ visible, onClose, onAdd }) => {
+  onAddTask: (title: string, description?: string, priority?: TaskPriority) => void;
+}> = ({ visible, onClose, onAddTask }) => {
   const { theme } = useTheme();
 
   // Lomakkeen tila
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [priority, setPriority] = useState<TaskPriority>('medium');
 
   // Tyhjennetään kentät ja suljetaan modali
   const handleClose = () => {
     setTitle('');
     setDescription('');
+    setPriority('medium');
     onClose();
   };
 
@@ -31,11 +35,12 @@ const AddTaskModal: React.FC<{
     }
 
     // Kutsutaan parentin antamaa callbackia
-    onAdd(title.trim(), description.trim() || undefined);
+    onAddTask(title.trim(), description.trim() || undefined, priority);
 
     // Tyhjennetään lomake ja suljetaan modali
     setTitle('');
     setDescription('');
+    setPriority('medium');
     onClose();
   };
 
@@ -59,7 +64,7 @@ const AddTaskModal: React.FC<{
             value={title}
             onChangeText={setTitle}
             placeholder="Tehtävän otsikkko"
-            placeholderTextColor={theme.colors.text}
+            placeholderTextColor={theme.colors.border}
             style={[
               styles.input,
               { borderColor: theme.colors.border, color: theme.colors.text },
@@ -72,7 +77,7 @@ const AddTaskModal: React.FC<{
             value={description}
             onChangeText={setDescription}
             placeholder="Lisätiedot tehtävästä"
-            placeholderTextColor={theme.colors.text}
+            placeholderTextColor={theme.colors.border}
             multiline
             style={[
               styles.input,
@@ -80,6 +85,10 @@ const AddTaskModal: React.FC<{
               { borderColor: theme.colors.border, color: theme.colors.text },
             ]}
           />
+
+          {/* Prioriteetti */}
+          <Text style={[styles.label, { color: theme.colors.text }]}>Prioriteetti</Text>
+          <PriorityPicker selected={priority} onSelect={setPriority} />
 
           {/* Napit */}
           <View style={styles.row}>

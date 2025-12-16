@@ -13,6 +13,7 @@ import TaskItem from '../components/Task/TaskItem';
 import { Ionicons } from '@expo/vector-icons';
 import FABButton from '../components/UI/FABButton';
 import AddTaskModal from '../components/Task/AddTaskModal';
+import { TaskPriority } from '../types/Task';
 
 type Props = {
   onLogout: () => void;
@@ -67,8 +68,8 @@ const TaskListScreen: React.FC<Props> = ({ onLogout }) => {
 
   const activeTasksCount = tasks.filter(t => !t.completed).length;
 
-  const handleAddTask = (title: string, description?: string) => {
-    addTask(title, description);
+  const handleAddTask = (title: string, description?: string, priority?: TaskPriority) => {
+    addTask(title, description, priority);
     setIsAddModalVisible(false);
   };
 
@@ -147,4 +148,3 @@ const TaskListScreen: React.FC<Props> = ({ onLogout }) => {
 };
 
 export default TaskListScreen;
-

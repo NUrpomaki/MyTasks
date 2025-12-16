@@ -10,5 +10,8 @@ export const darkTheme: Theme = {
     border: '#3A3A3C',        // Tumman harmaa reuna
     success: '#30D158',       // Vihreä
     danger: '#FF453A',        // Punainen
+    priorityHigh: '#FF453A',  // Punainen - korkea prioriteetti
+    priorityMedium: '#FF9F0A', // Oranssi - keskitaso
+    priorityLow: '#30D158',   // Vihreä - matala prioriteetti
   },
 };

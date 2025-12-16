@@ -1,3 +1,6 @@
+// Prioriteettitasot tehtäville
+export type TaskPriority = 'high' | 'medium' | 'low';
+
 export interface Task {
   /** Tehtävän yksilöllinen tunniste */
   id: string;
@@ -8,5 +11,7 @@ export interface Task {
   /** Onko tehtävä valmis? */
   completed: boolean;
   /** Aikaleima tehtävän luomisesta */
-  createdAt: number; 
+  createdAt: number;
+  /** Tehtävän prioriteetti (high/medium/low) */
+  priority: TaskPriority;
 }

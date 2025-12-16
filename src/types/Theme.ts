@@ -6,6 +6,9 @@ export interface Colors {
   border: string; // Reunaviivojen väri
   success: string; // Valmis/onnistunut väri
   danger: string; // Poisto/virhe väri
+  priorityHigh: string; // Korkea prioriteetti
+  priorityMedium: string; // Keskitason prioriteetti
+  priorityLow: string; // Matala prioriteetti
 }
 
 export type ThemeName = 'light' | 'dark';

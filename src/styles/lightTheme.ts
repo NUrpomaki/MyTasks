@@ -10,5 +10,8 @@ export const lightTheme: Theme = {
     border: '#C7C7CC',        // Harmaa reuna
     success: '#34C759',       // Vihreä
     danger: '#FF3B30',        // Punainen
+    priorityHigh: '#FF3B30',  // Punainen - korkea prioriteetti
+    priorityMedium: '#FF9500', // Oranssi - keskitaso
+    priorityLow: '#34C759',   // Vihreä - matala prioriteetti
   },
 };

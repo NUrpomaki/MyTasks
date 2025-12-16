@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Task } from '../../types/Task';
 import { useTheme } from '../../context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons'; // Ikonien käyttö
+import PriorityBadge from './PriorityBadge';
 
 interface TaskItemProps {
   task: Task;
@@ -33,6 +34,11 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete }) => {
       flex: 1,
       marginLeft: 10,
     },
+    titleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
     title: {
       fontSize: 16,
       fontWeight: '600',
@@ -40,6 +46,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete }) => {
       // Viiva tehtyjen tehtävien yli
       textDecorationLine: task.completed ? 'line-through' : 'none',
       textDecorationColor: theme.colors.text,
+      flex: 1,
     },
     description: {
       fontSize: 12,
@@ -67,11 +74,14 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete }) => {
         />
       </TouchableOpacity>
       
-      {/* 2. Teksti */}
+      {/* 2. Teksti ja prioriteetti */}
       <View style={dynamicStyles.textContainer}>
-        <Text style={dynamicStyles.title} numberOfLines={1}>
-          {task.title}
-        </Text>
+        <View style={dynamicStyles.titleRow}>
+          <Text style={dynamicStyles.title} numberOfLines={1}>
+            {task.title}
+          </Text>
+          <PriorityBadge priority={task.priority} />
+        </View>
         {task.description && (
             <Text style={dynamicStyles.description} numberOfLines={1}>
                 {task.description}
