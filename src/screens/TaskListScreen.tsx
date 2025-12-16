@@ -6,6 +6,8 @@ import {
   StyleSheet,
   SafeAreaView,
   TouchableOpacity,
+  Platform,
+  StatusBar,
 } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { useTasks } from '../context/TaskContext';
@@ -37,6 +39,7 @@ const TaskListScreen: React.FC<Props> = ({ onLogout, onOpenStats }) => {
     safeArea: {
       flex: 1,
       backgroundColor: theme.colors.background,
+      paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     },
     header: {
       flexDirection: 'row',
