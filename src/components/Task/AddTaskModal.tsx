@@ -3,13 +3,14 @@ import { Modal, View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } fro
 import { useTheme } from '../../context/ThemeContext';
 import { TaskPriority } from '../../types/Task';
 import PriorityPicker from './PriorityPicker';
+import DueDatePicker from './DueDatePicker';
 
 // Modal uuden tehtävän lisäämistä varten.
-// Sisältää otsikon, kuvauksen ja prioriteetin valinnan.
+// Sisältää otsikon, kuvauksen, prioriteetin ja määräajan valinnan.
 const AddTaskModal: React.FC<{
   visible: boolean;
   onClose: () => void;
-  onAddTask: (title: string, description?: string, priority?: TaskPriority) => void;
+  onAddTask: (title: string, description?: string, priority?: TaskPriority, dueDate?: number) => void;
 }> = ({ visible, onClose, onAddTask }) => {
   const { theme } = useTheme();
 
@@ -17,12 +18,14 @@ const AddTaskModal: React.FC<{
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<TaskPriority>('medium');
+  const [dueDate, setDueDate] = useState<Date | null>(null);
 
   // Tyhjennetään kentät ja suljetaan modali
   const handleClose = () => {
     setTitle('');
     setDescription('');
     setPriority('medium');
+    setDueDate(null);
     onClose();
   };
 
@@ -35,12 +38,18 @@ const AddTaskModal: React.FC<{
     }
 
     // Kutsutaan parentin antamaa callbackia
-    onAddTask(title.trim(), description.trim() || undefined, priority);
+    onAddTask(
+      title.trim(), 
+      description.trim() || undefined, 
+      priority,
+      dueDate ? dueDate.getTime() : undefined
+    );
 
     // Tyhjennetään lomake ja suljetaan modali
     setTitle('');
     setDescription('');
     setPriority('medium');
+    setDueDate(null);
     onClose();
   };
 
@@ -89,6 +98,10 @@ const AddTaskModal: React.FC<{
           {/* Prioriteetti */}
           <Text style={[styles.label, { color: theme.colors.text }]}>Prioriteetti</Text>
           <PriorityPicker selected={priority} onSelect={setPriority} />
+
+          {/* Määräaika */}
+          <Text style={[styles.label, { color: theme.colors.text }]}>Määräaika (valinnainen)</Text>
+          <DueDatePicker value={dueDate} onChange={setDueDate} />
 
           {/* Napit */}
           <View style={styles.row}>

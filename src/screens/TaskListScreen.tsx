@@ -111,8 +111,8 @@ const TaskListScreen: React.FC<Props> = ({ onLogout }) => {
 
   const activeTasksCount = tasks.filter(t => !t.completed).length;
 
-  const handleAddTask = (title: string, description?: string, priority?: TaskPriority) => {
-    addTask(title, description, priority);
+  const handleAddTask = (title: string, description?: string, priority?: TaskPriority, dueDate?: number) => {
+    addTask(title, description, priority, dueDate);
     setIsAddModalVisible(false);
   };
 

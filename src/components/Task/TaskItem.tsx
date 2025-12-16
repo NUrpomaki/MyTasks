@@ -4,6 +4,7 @@ import { Task } from '../../types/Task';
 import { useTheme } from '../../context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons'; // Ikonien käyttö
 import PriorityBadge from './PriorityBadge';
+import DueDateBadge from './DueDateBadge';
 
 interface TaskItemProps {
   task: Task;
@@ -53,6 +54,12 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete }) => {
       color: theme.colors.border,
       marginTop: 2,
     },
+    badgeRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      marginTop: 4,
+    },
     icon: {
       marginRight: 10,
     },
@@ -74,19 +81,23 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete }) => {
         />
       </TouchableOpacity>
       
-      {/* 2. Teksti ja prioriteetti */}
+      {/* 2. Teksti, prioriteetti ja määräaika */}
       <View style={dynamicStyles.textContainer}>
-        <View style={dynamicStyles.titleRow}>
-          <Text style={dynamicStyles.title} numberOfLines={1}>
-            {task.title}
-          </Text>
-          <PriorityBadge priority={task.priority} />
-        </View>
+        <Text style={dynamicStyles.title} numberOfLines={1}>
+          {task.title}
+        </Text>
         {task.description && (
-            <Text style={dynamicStyles.description} numberOfLines={1}>
-                {task.description}
-            </Text>
+          <Text style={dynamicStyles.description} numberOfLines={1}>
+            {task.description}
+          </Text>
         )}
+        {/* Badget prioriteetille ja määräajalle */}
+        <View style={dynamicStyles.badgeRow}>
+          <PriorityBadge priority={task.priority} />
+          {task.dueDate && (
+            <DueDateBadge dueDate={task.dueDate} completed={task.completed} />
+          )}
+        </View>
       </View>
 
       {/* 3. Poisto ikoni */}

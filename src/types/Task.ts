@@ -14,4 +14,6 @@ export interface Task {
   createdAt: number;
   /** Tehtävän prioriteetti (high/medium/low) */
   priority: TaskPriority;
+  /** Tehtävän määräaika (valinnainen) */
+  dueDate?: number;
 }
