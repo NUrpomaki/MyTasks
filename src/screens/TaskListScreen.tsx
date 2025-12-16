@@ -19,9 +19,10 @@ import { TaskPriority } from '../types/Task';
 
 type Props = {
   onLogout: () => void;
+  onOpenStats: () => void;
 };
 
-const TaskListScreen: React.FC<Props> = ({ onLogout }) => {
+const TaskListScreen: React.FC<Props> = ({ onLogout, onOpenStats }) => {
   const { theme, toggleTheme } = useTheme();
   const { tasks, deleteTask, toggleTask, addTask } = useTasks();
 
@@ -146,6 +147,15 @@ const TaskListScreen: React.FC<Props> = ({ onLogout }) => {
         </View>
 
         <View style={dynamicStyles.headerRight}>
+          {/* Tilastot */}
+          <TouchableOpacity onPress={onOpenStats}>
+            <Ionicons
+              name="stats-chart"
+              size={26}
+              color={theme.colors.primary}
+            />
+          </TouchableOpacity>
+
           {/* Teeman vaihto */}
           <TouchableOpacity onPress={toggleTheme}>
             <Ionicons
