@@ -1,47 +1,67 @@
 import React, { useState } from 'react';
-import { Modal, View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
+import {
+  Modal,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  Alert,
+  Image,
+} from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
+import * as ImagePicker from 'expo-image-picker';
+import { Ionicons } from '@expo/vector-icons';
 
 // Modal uuden tehtävän lisäämistä varten.
-// Tässä vaiheessa: otsikko + kuvaus + lisää/peruuta, ei vielä kuvaa.
 const AddTaskModal: React.FC<{
   visible: boolean;
   onClose: () => void;
-  onAdd: (title: string, description?: string) => void;
+  onAdd: (title: string, description?: string, imageUri?: string) => void;
 }> = ({ visible, onClose, onAdd }) => {
   const { theme } = useTheme();
 
   // Lomakkeen tila
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [imageUri, setImageUri] = useState<string | undefined>(undefined);
 
-  // Tyhjennetään kentät ja suljetaan modali
   const handleClose = () => {
     setTitle('');
     setDescription('');
+    setImageUri(undefined);
     onClose();
   };
 
-  // Validointi + lisäys
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.7,
+    });
+
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri);
+    }
+  };
+
   const handleAdd = () => {
-    // Robustisuus: otsikko on pakollinen
     if (!title.trim()) {
       Alert.alert('Puuttuu otsikko', 'Anna tehtävälle otsikko.');
       return;
     }
 
-    // Kutsutaan parentin antamaa callbackia
-    onAdd(title.trim(), description.trim() || undefined);
-
-    // Tyhjennetään lomake ja suljetaan modali
-    setTitle('');
-    setDescription('');
-    onClose();
+    onAdd(title.trim(), description.trim() || undefined, imageUri);
+    handleClose();
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={handleClose}>
-      {/* Tumma tausta modaalin alla */}
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={handleClose}
+    >
       <View style={styles.backdrop}>
         <View
           style={[
@@ -54,11 +74,13 @@ const AddTaskModal: React.FC<{
           </Text>
 
           {/* Otsikko */}
-          <Text style={[styles.label, { color: theme.colors.text }]}>Otsikko</Text>
+          <Text style={[styles.label, { color: theme.colors.text }]}>
+            Otsikko
+          </Text>
           <TextInput
             value={title}
             onChangeText={setTitle}
-            placeholder="Tehtävän otsikkko"
+            placeholder="Tehtävän otsikko"
             placeholderTextColor={theme.colors.text}
             style={[
               styles.input,
@@ -67,7 +89,9 @@ const AddTaskModal: React.FC<{
           />
 
           {/* Kuvaus */}
-          <Text style={[styles.label, { color: theme.colors.text }]}>Kuvaus (valinnainen)</Text>
+          <Text style={[styles.label, { color: theme.colors.text }]}>
+            Kuvaus (valinnainen)
+          </Text>
           <TextInput
             value={description}
             onChangeText={setDescription}
@@ -80,6 +104,30 @@ const AddTaskModal: React.FC<{
               { borderColor: theme.colors.border, color: theme.colors.text },
             ]}
           />
+
+          <Text style={[styles.label, { color: theme.colors.text }]}>
+            Lisää kuva (valinnainen)
+          </Text>
+
+          <TouchableOpacity
+            onPress={pickImage}
+            style={[
+              styles.imageButton,
+              { backgroundColor: theme.colors.primary },
+            ]}
+          >
+            <Ionicons name="add" size={22} color="#fff" />
+            <Text style={styles.imageButtonText}>Valitse kuva</Text>
+          </TouchableOpacity>
+
+          {imageUri && (
+            <>
+              <Text style={[styles.label, { color: theme.colors.text }]}>
+                Valittu kuva
+              </Text>
+              <Image source={{ uri: imageUri }} style={styles.previewImage} />
+            </>
+          )}
 
           {/* Napit */}
           <View style={styles.row}>
@@ -94,14 +142,16 @@ const AddTaskModal: React.FC<{
 
             <TouchableOpacity
               onPress={handleAdd}
-              style={[styles.primaryBtn, { backgroundColor: theme.colors.primary }]}
+              style={[
+                styles.primaryBtn,
+                { backgroundColor: theme.colors.primary },
+              ]}
             >
               <Text style={{ color: '#fff', fontWeight: '900' }}>
                 Lisää
               </Text>
             </TouchableOpacity>
           </View>
-
         </View>
       </View>
     </Modal>
@@ -139,6 +189,12 @@ const styles = StyleSheet.create({
     height: 90,
     textAlignVertical: 'top',
   },
+  previewImage: {
+    width: '100%',
+    height: 180,
+    borderRadius: 12,
+    marginTop: 10,
+  },
   row: {
     flexDirection: 'row',
     gap: 10,
@@ -156,6 +212,20 @@ const styles = StyleSheet.create({
     padding: 12,
     alignItems: 'center',
     borderWidth: 1,
+  },
+  imageButton: {
+    borderRadius: 30,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
+  imageButtonText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 16,
+    marginLeft: 8,
   },
 });
 

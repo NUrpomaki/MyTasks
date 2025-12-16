@@ -67,8 +67,8 @@ const TaskListScreen: React.FC<Props> = ({ onLogout }) => {
 
   const activeTasksCount = tasks.filter(t => !t.completed).length;
 
-  const handleAddTask = (title: string, description?: string) => {
-    addTask(title, description);
+  const handleAddTask = (title: string, description?: string, imageUri?: string) => {
+    addTask(title, description, imageUri);
     setIsAddModalVisible(false);
   };
 
@@ -77,11 +77,7 @@ const TaskListScreen: React.FC<Props> = ({ onLogout }) => {
       {/* Header */}
       <View style={dynamicStyles.header}>
         <View style={dynamicStyles.headerLeft}>
-          <Ionicons
-            name="list"
-            size={26}
-            color={theme.colors.primary}
-          />
+          <Ionicons name="list" size={26} color={theme.colors.primary} />
           <Text style={dynamicStyles.headerTitle}>
             Omat Tehtävät ({activeTasksCount})
           </Text>
@@ -140,11 +136,10 @@ const TaskListScreen: React.FC<Props> = ({ onLogout }) => {
       <AddTaskModal
         visible={isAddModalVisible}
         onClose={() => setIsAddModalVisible(false)}
-        onAddTask={handleAddTask}
+        onAdd={handleAddTask}
       />
     </SafeAreaView>
   );
 };
 
 export default TaskListScreen;
-

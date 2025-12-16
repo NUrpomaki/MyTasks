@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Task } from '../../types/Task';
 import { useTheme } from '../../context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons'; // Ikonien käyttö
@@ -49,41 +49,58 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete }) => {
     icon: {
       marginRight: 10,
     },
+    image: {
+      width: 50,
+      height: 50,
+      borderRadius: 8,
+      marginLeft: 10,
+    },
     deleteButton: {
-        marginLeft: 15,
-        padding: 5,
-    }
+      marginLeft: 15,
+      padding: 5,
+    },
   });
 
   return (
     <View style={dynamicStyles.card}>
       {/* 1. Valmis/Keskeneräinen ikoni */}
       <TouchableOpacity onPress={() => onToggle(task.id)}>
-        <Ionicons 
-          name={task.completed ? 'checkmark-circle' : 'ellipse-outline'} 
-          size={24} 
-          color={task.completed ? theme.colors.success : theme.colors.border} 
+        <Ionicons
+          name={task.completed ? 'checkmark-circle' : 'ellipse-outline'}
+          size={24}
+          color={task.completed ? theme.colors.success : theme.colors.border}
           style={dynamicStyles.icon}
         />
       </TouchableOpacity>
-      
+
       {/* 2. Teksti */}
       <View style={dynamicStyles.textContainer}>
         <Text style={dynamicStyles.title} numberOfLines={1}>
           {task.title}
         </Text>
         {task.description && (
-            <Text style={dynamicStyles.description} numberOfLines={1}>
-                {task.description}
-            </Text>
+          <Text style={dynamicStyles.description} numberOfLines={1}>
+            {task.description}
+          </Text>
         )}
       </View>
 
+      {/* 2.5 Kuva (jos olemassa) */}
+      {task.imageUri && (
+        <Image
+          source={{ uri: task.imageUri }}
+          style={dynamicStyles.image}
+        />
+      )}
+
       {/* 3. Poisto ikoni */}
-      <TouchableOpacity onPress={() => onDelete(task.id)} style={dynamicStyles.deleteButton}>
+      <TouchableOpacity
+        onPress={() => onDelete(task.id)}
+        style={dynamicStyles.deleteButton}
+      >
         <Ionicons
-          name="trash-bin-outline" 
-          size={22} 
+          name="trash-bin-outline"
+          size={22}
           color={theme.colors.danger}
         />
       </TouchableOpacity>
