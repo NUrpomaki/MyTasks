@@ -1,53 +1,105 @@
-import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
+import React, {
+  createContext,
+  useState,
+  useContext,
+  ReactNode,
+  useCallback,
+} from 'react';
 import { Task, TaskPriority } from '../types/Task';
 import 'react-native-get-random-values';
-import { v4 as uuidv4 } from 'uuid'; // Käytetään luomaan uniikkeja ID:itä
+import { v4 as uuidv4 } from 'uuid';
 
 // 1. Määritellään kontekstin muoto
 interface TaskContextType {
   tasks: Task[];
-  addTask: (title: string, description?: string, priority?: TaskPriority, dueDate?: number) => void;
+  addTask: (
+    title: string,
+    description?: string,
+    priority?: TaskPriority,
+    dueDate?: number,
+    imageUri?: string
+  ) => void;
   deleteTask: (id: string) => void;
-  toggleTask: (id: string) => void; // Merkitse tehdyksi/keskeneräiseksi
+  toggleTask: (id: string) => void;
 }
 
 // 2. Luodaan konteksti
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
-// 3. Luo provider komponentti
+// 3. Provider
 export const TaskProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // Alkuperäinen esimerkki dataa testausta varten
   const [tasks, setTasks] = useState<Task[]>([
-    { id: uuidv4(), title: 'Suunnittele komponentit', description: 'Aloita TaskItemin ja FlatListin luomisella.', completed: true, createdAt: Date.now() - 3600000, priority: 'high', dueDate: Date.now() - 86400000 },
-    { id: uuidv4(), title: 'Tee ThemeContext', description: 'Toteuta tumman ja vaalean teeman vaihtomekanismi.', completed: true, createdAt: Date.now() - 1800000, priority: 'medium' },
-    { id: uuidv4(), title: 'Koodaa TaskListScreen', description: 'Tämä on pääsivu, jolla tehtävät näkyvät.', completed: false, createdAt: Date.now(), priority: 'high', dueDate: Date.now() },
-    { id: uuidv4(), title: 'Lisää navigointi', description: 'React Navigationin käyttöönotto kirjautumiseen ja listanäkymään.', completed: false, createdAt: Date.now() - 600000, priority: 'low', dueDate: Date.now() + 86400000 * 3 },
-  ]);
-
-  // Lisää uusi tehtävä
-  const addTask = useCallback((title: string, description?: string, priority: TaskPriority = 'medium', dueDate?: number) => {
-    const newTask: Task = {
+    {
       id: uuidv4(),
-      title,
-      description,
+      title: 'Suunnittele komponentit',
+      description: 'Aloita TaskItemin ja FlatListin luomisella.',
+      completed: true,
+      createdAt: Date.now() - 3600000,
+      priority: 'high',
+      dueDate: Date.now() - 86400000,
+    },
+    {
+      id: uuidv4(),
+      title: 'Tee ThemeContext',
+      description: 'Toteuta tumman ja vaalean teeman vaihtomekanismi.',
+      completed: true,
+      createdAt: Date.now() - 1800000,
+      priority: 'medium',
+    },
+    {
+      id: uuidv4(),
+      title: 'Koodaa TaskListScreen',
+      description: 'Tämä on pääsivu, jolla tehtävät näkyvät.',
       completed: false,
       createdAt: Date.now(),
-      priority,
-      dueDate,
-    };
-    setTasks(prevTasks => [newTask, ...prevTasks]); // Lisätään uusi tehtävä listan alkuun
-  }, []);
+      priority: 'high',
+      dueDate: Date.now(),
+    },
+    {
+      id: uuidv4(),
+      title: 'Lisää navigointi',
+      description: 'React Navigationin käyttöönotto kirjautumiseen ja listanäkymään.',
+      completed: false,
+      createdAt: Date.now() - 600000,
+      priority: 'low',
+      dueDate: Date.now() + 86400000 * 3,
+    },
+  ]);
 
-  // Poista tehtävä
+  const addTask = useCallback(
+    (
+      title: string,
+      description?: string,
+      priority: TaskPriority = 'medium',
+      dueDate?: number,
+      imageUri?: string
+    ) => {
+      const newTask: Task = {
+        id: uuidv4(),
+        title,
+        description,
+        completed: false,
+        createdAt: Date.now(),
+        priority,
+        dueDate,
+        imageUri,
+      };
+
+      setTasks(prev => [newTask, ...prev]);
+    },
+    []
+  );
+
   const deleteTask = useCallback((id: string) => {
-    setTasks(prevTasks => prevTasks.filter(task => task.id !== id));
+    setTasks(prev => prev.filter(task => task.id !== id));
   }, []);
 
-  // Merkitse tehdyksi/keskeneräiseksi
   const toggleTask = useCallback((id: string) => {
-    setTasks(prevTasks => 
-      prevTasks.map(task => 
-        task.id === id ? { ...task, completed: !task.completed } : task
+    setTasks(prev =>
+      prev.map(task =>
+        task.id === id
+          ? { ...task, completed: !task.completed }
+          : task
       )
     );
   }, []);
@@ -59,10 +111,10 @@ export const TaskProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   );
 };
 
-// 4. Custom Hook kontekstin käyttämiseen
+// 4. Hook
 export const useTasks = () => {
   const context = useContext(TaskContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useTasks must be used within a TaskProvider');
   }
   return context;
