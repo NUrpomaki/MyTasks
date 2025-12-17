@@ -76,34 +76,29 @@ const TaskListScreen: React.FC<Props> = ({ onLogout, onOpenStats }) => {
     },
   });
 
-  // Lasketaan tehtävien määrät suodattimia varten
   const filterCounts = useMemo(() => ({
     all: tasks.length,
     active: tasks.filter(t => !t.completed).length,
     completed: tasks.filter(t => t.completed).length,
   }), [tasks]);
 
-  // Suodatetaan tehtävät haun ja filterin perusteella
   const filteredTasks = useMemo(() => {
     let result = [...tasks];
 
-    // Ensin suodatetaan tilan mukaan
     if (activeFilter === 'active') {
       result = result.filter(t => !t.completed);
     } else if (activeFilter === 'completed') {
       result = result.filter(t => t.completed);
     }
 
-    // Sitten haun perusteella
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
-      result = result.filter(t => 
+      result = result.filter(t =>
         t.title.toLowerCase().includes(query) ||
         (t.description && t.description.toLowerCase().includes(query))
       );
     }
 
-    // Järjestetään: keskeneräiset ensin, sitten luontipäivän mukaan
     return result.sort((a, b) =>
       a.completed === b.completed
         ? b.createdAt - a.createdAt
@@ -115,22 +110,21 @@ const TaskListScreen: React.FC<Props> = ({ onLogout, onOpenStats }) => {
 
   const activeTasksCount = tasks.filter(t => !t.completed).length;
 
-  const handleAddTask = (title: string, description?: string, priority?: TaskPriority, dueDate?: number) => {
-    addTask(title, description, priority, dueDate);
+  const handleAddTask = (
+    title: string,
+    description?: string,
+    priority?: TaskPriority,
+    dueDate?: number,
+    imageUri?: string
+  ) => {
+    addTask(title, description, priority, dueDate, imageUri);
     setIsAddModalVisible(false);
   };
 
-  // Tyhjän listan teksti riippuu hakutilasta
   const getEmptyMessage = () => {
-    if (searchQuery.trim()) {
-      return 'Ei hakutuloksia.';
-    }
-    if (activeFilter === 'active') {
-      return 'Ei aktiivisia tehtäviä.';
-    }
-    if (activeFilter === 'completed') {
-      return 'Ei valmiita tehtäviä.';
-    }
+    if (searchQuery.trim()) return 'Ei hakutuloksia.';
+    if (activeFilter === 'active') return 'Ei aktiivisia tehtäviä.';
+    if (activeFilter === 'completed') return 'Ei valmiita tehtäviä.';
     return 'Ei tehtäviä. Lisää uusi!';
   };
 
@@ -139,27 +133,17 @@ const TaskListScreen: React.FC<Props> = ({ onLogout, onOpenStats }) => {
       {/* Header */}
       <View style={dynamicStyles.header}>
         <View style={dynamicStyles.headerLeft}>
-          <Ionicons
-            name="list"
-            size={26}
-            color={theme.colors.primary}
-          />
+          <Ionicons name="list" size={26} color={theme.colors.primary} />
           <Text style={dynamicStyles.headerTitle}>
             Omat Tehtävät ({activeTasksCount})
           </Text>
         </View>
 
         <View style={dynamicStyles.headerRight}>
-          {/* Tilastot */}
           <TouchableOpacity onPress={onOpenStats}>
-            <Ionicons
-              name="stats-chart"
-              size={26}
-              color={theme.colors.primary}
-            />
+            <Ionicons name="stats-chart" size={26} color={theme.colors.primary} />
           </TouchableOpacity>
 
-          {/* Teeman vaihto */}
           <TouchableOpacity onPress={toggleTheme}>
             <Ionicons
               name={theme.name === 'light' ? 'moon' : 'sunny'}
@@ -168,31 +152,20 @@ const TaskListScreen: React.FC<Props> = ({ onLogout, onOpenStats }) => {
             />
           </TouchableOpacity>
 
-          {/* Kirjaudu ulos */}
           <TouchableOpacity onPress={onLogout}>
-            <Ionicons
-              name="log-out-outline"
-              size={26}
-              color={theme.colors.primary}
-            />
+            <Ionicons name="log-out-outline" size={26} color={theme.colors.primary} />
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* Hakupalkki */}
-      <SearchBar 
-        value={searchQuery} 
-        onChangeText={setSearchQuery} 
-      />
+      <SearchBar value={searchQuery} onChangeText={setSearchQuery} />
 
-      {/* Suodatinvälilehdet */}
       <FilterTabs
         selected={activeFilter}
         onSelect={setActiveFilter}
         counts={filterCounts}
       />
 
-      {/* Tehtävälista */}
       <FlatList
         style={dynamicStyles.list}
         data={filteredTasks}
@@ -211,10 +184,8 @@ const TaskListScreen: React.FC<Props> = ({ onLogout, onOpenStats }) => {
         }
       />
 
-      {/* Floating Action Button */}
       <FABButton onPress={() => setIsAddModalVisible(true)} />
 
-      {/* Add Task Modal */}
       <AddTaskModal
         visible={isAddModalVisible}
         onClose={() => setIsAddModalVisible(false)}

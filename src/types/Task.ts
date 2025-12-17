@@ -7,7 +7,7 @@ export interface Task {
   /** Tehtävän otsikko */
   title: string;
   /** Tehtävän tarkempi kuvaus */
-  description?: string; 
+  description?: string;
   /** Onko tehtävä valmis? */
   completed: boolean;
   /** Aikaleima tehtävän luomisesta */
@@ -16,4 +16,6 @@ export interface Task {
   priority: TaskPriority;
   /** Tehtävän määräaika (valinnainen) */
   dueDate?: number;
+  /** Tehtävään liitetty kuva (valinnainen) */
+  imageUri?: string;
 }
